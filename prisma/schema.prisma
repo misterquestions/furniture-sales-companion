@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id           String             @id @default(cuid())
+  slug         String             @unique
+  name         String
+  category     String
+  subtype      String
+  description  String
+  priceList    Int
+  isExhibition Boolean            @default(false)
+  imageUrl     String
+  fabrics      ProductFabric[]
+  inventory    InventorySnapshot?
+  tags         ProductTag[]
+  discountRules DiscountRule[]
+  providerId   String?
+  provider     Provider?         @relation(fields: [providerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Fabric {
+  id          String          @id @default(cuid())
+  name        String
+  colorHex    String          @default("#e5e7eb")
+  description String?
+  products    ProductFabric[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductFabric {
+  productId String
+  fabricId  String
+  isPrimary Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id])
+  fabric  Fabric  @relation(fields: [fabricId], references: [id])
+
+  @@id([productId, fabricId])
+}
+
+model InventorySnapshot {
+  id             String   @id @default(cuid())
+  productId      String   @unique
+  onHand         Int      @default(0)
+  incoming       Int?
+  leadTimeWeeks  Int?
+  notes          String?
+  product        Product  @relation(fields: [productId], references: [id])
+  lastUpdatedBy  String?  @db.VarChar(128)
+  lastUpdatedAt  DateTime @default(now())
+}
+
+model ProductTag {
+  id        String  @id @default(cuid())
+  productId String
+  value     String
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model DiscountRule {
+  id          String            @id @default(cuid())
+  label       String
+  percentage  Decimal           @db.Decimal(5, 4)
+  applyOn     DiscountApplyOn
+  mode        DiscountMode
+  description String?
+  priority    Int               @default(0)
+  isActive    Boolean           @default(true)
+
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Provider {
+  id            String    @id @default(cuid())
+  name          String
+  contactName   String?
+  email         String?
+  phone         String?
+  leadTimeWeeks Int?
+  notes         String?
+  rating        Int?
+  products      Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DiscountApplyOn {
+  BASE
+  RUNNING
+}
+
+enum DiscountMode {
+  DISCOUNT
+  MARKUP
+}
