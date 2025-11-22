@@ -6,14 +6,14 @@ import { getCatalogProduct } from "@/lib/services/catalog-service";
 
 type ProductPageProps = {
   params: Promise<{
-    productId: string;
+    id: string;
   }>;
 };
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { productId } = await params;
+  const { id } = await params;
   const { product, fabrics, discountRules } = await getCatalogProduct(
-    productId
+    id
   );
 
   if (!product) {
@@ -33,7 +33,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           fabrics={fabrics}
           priceBreakdown={priceBreakdown}
           mode="page"
-          backHref="/catalog"
+          backHref="/products"
         />
       </div>
     </div>

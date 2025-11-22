@@ -24,16 +24,10 @@ export default function LandingPage() {
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
-            href="/catalog"
+            href="/products"
             className="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(16,185,129,0.35)] transition hover:bg-emerald-700"
           >
             Ir al catálogo
-          </Link>
-          <Link
-            href="/gestion"
-            className="inline-flex items-center justify-center rounded-2xl border border-emerald-200 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 hover:border-emerald-300"
-          >
-            Gestionar datos
           </Link>
         </div>
       </section>

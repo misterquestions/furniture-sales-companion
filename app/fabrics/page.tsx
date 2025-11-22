@@ -1,6 +1,7 @@
 import { getCatalogPayload } from "@/lib/services/catalog-service";
 import { pluralizeWord } from "@/lib/strings";
 import type { Fabric } from "@/types";
+import { AddResourceButton } from "@/components/management/add-resource-button";
 
 export default async function FabricsPage() {
   const { fabrics, products } = await getCatalogPayload();
@@ -20,6 +21,9 @@ export default async function FabricsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <AddResourceButton type="fabric" label="+ Nueva tela" />
+      </div>
       <section className="grid gap-3 sm:grid-cols-3">
         <SummaryCard label="Telas activas" value={fabrics.length} hint="Disponibles para modelos" />
         <SummaryCard

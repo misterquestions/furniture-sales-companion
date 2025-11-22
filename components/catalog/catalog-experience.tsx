@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { FiltersBar } from "./filters-bar";
 import { ProductCard } from "./product-card";
 import { ProductDetail } from "./product-detail";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { CategoryManager } from "./category-manager";
+import { AddResourceButton } from "../management/add-resource-button";
 
 type CatalogExperienceProps = {
   initialProducts: CatalogProduct[];
@@ -159,7 +162,7 @@ export function CatalogExperience({
     : null;
 
   const getProductDetailRoute = (product: CatalogProduct) =>
-    `/modelos/${product.slug ?? product.id}`;
+    `/products/${product.slug ?? product.id}`;
 
   const handleProductOpen = (product: CatalogProduct) => {
     if (isMobileView) {
@@ -179,169 +182,190 @@ export function CatalogExperience({
     });
   };
 
-  const handleFiltersChange = (next: CatalogFilters) => {
-    setFilters(() => {
-      setPage(1);
-      return next;
-    });
-  };
-
   const refetch = () => setRequestVersion((value) => value + 1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   return (
-    <div className="flex flex-col gap-5 text-gray-900">
-      <section className="relative rounded-[30px] border border-white/60 bg-gradient-to-b from-emerald-50/80 to-white p-5 shadow-[0_18px_60px_rgba(16,185,129,0.12)]">
-        <Link
-          href="/gestion"
-          className="absolute right-5 top-5 inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 transition hover:text-emerald-900"
-        >
-          Administrar catálogo
-          <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M3 1l4 5-4 5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Link>
-        <div className="flex flex-col gap-4">
-          <div className="relative">
-            <input
-              type="search"
-              value={filters.query ?? ""}
-              onChange={(event) =>
-                updateFilters((current) => ({
-                  ...current,
-                  query: event.target.value || undefined,
-                }))
-              }
-              placeholder="Busca por modelo, proveedor o material"
-              className="w-full rounded-3xl border border-transparent bg-white px-5 py-4 text-sm font-medium text-gray-700 shadow-[0_12px_30px_rgba(15,118,110,0.15)] outline-none ring-emerald-500/30 focus:ring"
-            />
-            {filters.query && (
-              <button
-                type="button"
-                onClick={() =>
-                  updateFilters((current) => ({
-                    ...current,
-                    query: undefined,
-                  }))
+    <div className="flex flex-col gap-6 pb-20">
+      <TabGroup selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+        <div className="flex items-center justify-between">
+          <TabList className="flex gap-1 rounded-full bg-emerald-50/50 p-1">
+            {["Modelos", "Categorías"].map((category) => (
+              <Tab
+                key={category}
+                className={({ selected }) =>
+                  `rounded-full px-4 py-1.5 text-sm font-medium leading-5 transition focus:outline-none ${
+                    selected
+                      ? "bg-white text-emerald-700 shadow"
+                      : "text-emerald-600/70 hover:bg-white/[0.12] hover:text-emerald-700"
+                  }`
                 }
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700"
               >
-                Limpiar
-              </button>
-            )}
-          </div>
-          <p className="text-xs text-gray-500">
-            Para filtrar por proveedor, categorías o precios usa el panel de
-            filtros avanzados.
-          </p>
+                {category}
+              </Tab>
+            ))}
+          </TabList>
+          {selectedIndex === 0 && (
+            <AddResourceButton
+              type="product"
+              label="+ Nuevo modelo"
+              categories={categories}
+            />
+          )}
         </div>
-      </section>
 
-      <details className="rounded-[28px] border border-white/60 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,118,110,0.08)]">
-        <summary className="cursor-pointer text-sm font-semibold text-gray-900">
-          Filtros avanzados (opcional)
-        </summary>
-        <div className="mt-4">
-          <FiltersBar
-            filters={filters}
-            onChange={setFilters}
-            categories={categories}
-            subtypes={subtypes}
-            providers={providers}
-            showSearch={false}
-            priceRange={catalogState.priceRange}
-          />
-        </div>
-      </details>
+        <TabPanels className="mt-6">
+          <TabPanel className="flex flex-col gap-6 focus:outline-none">
+            <section>
+              <div className="flex flex-col gap-4">
+                <div className="relative">
+                  <input
+                    type="search"
+                    value={filters.query ?? ""}
+                    onChange={(event) =>
+                      updateFilters((current) => ({
+                        ...current,
+                        query: event.target.value || undefined,
+                      }))
+                    }
+                    placeholder="Busca por modelo, proveedor o material"
+                    className="w-full rounded-3xl border border-transparent bg-white px-5 py-4 text-sm font-medium text-gray-700 shadow-[0_12px_30px_rgba(15,118,110,0.15)] outline-none ring-emerald-500/30 focus:ring"
+                  />
+                  {filters.query && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateFilters((current) => ({
+                          ...current,
+                          query: undefined,
+                        }))
+                      }
+                      className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700"
+                    >
+                      Limpiar
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">
+                  Para filtrar por proveedor, categorías o precios usa el panel
+                  de filtros avanzados.
+                </p>
+              </div>
+            </section>
 
-      <section className="flex-1 rounded-[32px] border border-white/60 bg-white/90 p-4 shadow-[0_10px_45px_rgba(15,118,110,0.08)] sm:p-5">
-        <div className="mb-4 flex flex-col gap-2 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            {hasResults
-              ? `Mostrando ${pageRangeStart}-${pageRangeEnd} de ${
-                  catalogState.total
-                } ${pluralizeWord(catalogState.total, "modelo")}`
-              : "No hay modelos con los filtros actuales"}
-          </span>
-          <span className="text-[11px] text-gray-500">
-            Tip: todo se actualiza al escribir, ideal para llamadas en vivo.
-          </span>
-        </div>
-        {errorMessage && (
-          <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 text-sm text-red-700">
-            <p>{errorMessage}</p>
-            <Button variant="secondary" onClick={refetch}>
-              Reintentar
-            </Button>
-          </div>
-        )}
-        {!hasResults && !isLoading ? (
-          <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 text-center text-sm text-gray-500">
-            <p className="font-semibold text-gray-600">
-              No encontramos modelos con esos filtros.
-            </p>
-            <p className="text-xs">
-              Prueba quitando algún filtro o cambiando el rango de precios.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div
-              className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${
-                isLoading ? "pointer-events-none opacity-60" : ""
-              }`}
-            >
-              {catalogState.products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  priceBreakdown={productBreakdownMap.get(product.id)!}
-                  fabricCount={product.fabrics.length}
-                  onOpenDetail={handleProductOpen}
+            <details className="rounded-[28px] border border-white/60 bg-white/80 p-4 shadow-[0_12px_35px_rgba(15,118,110,0.08)]">
+              <summary className="cursor-pointer text-sm font-semibold text-gray-900">
+                Filtros avanzados (opcional)
+              </summary>
+              <div className="mt-4">
+                <FiltersBar
+                  filters={filters}
+                  onChange={setFilters}
+                  categories={categories}
+                  subtypes={subtypes}
+                  providers={providers}
+                  showSearch={false}
+                  priceRange={catalogState.priceRange}
                 />
-              ))}
-            </div>
-            {isLoading && (
-              <p className="mt-3 text-center text-xs font-semibold text-emerald-700">
-                Actualizando catálogo...
-              </p>
-            )}
-            {showPagination && hasResults && (
-              <div className="mt-6 flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+              </div>
+            </details>
+
+            <section className="flex-1 rounded-[32px] border border-white/60 bg-white/90 p-4 shadow-[0_10px_45px_rgba(15,118,110,0.08)] sm:p-5">
+              <div className="mb-4 flex flex-col gap-2 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
                 <span>
-                  Página {page} de {totalPages} · Mostrando {pageRangeStart}-
-                  {pageRangeEnd} de {catalogState.total}
+                  {hasResults
+                    ? `Mostrando ${pageRangeStart}-${pageRangeEnd} de ${
+                        catalogState.total
+                      } ${pluralizeWord(catalogState.total, "modelo")}`
+                    : "No hay modelos con los filtros actuales"}
                 </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    onClick={() =>
-                      setPage((current) => Math.max(1, current - 1))
-                    }
-                    disabled={page === 1 || isLoading}
-                  >
-                    Anterior
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() =>
-                      setPage((current) => Math.min(totalPages, current + 1))
-                    }
-                    disabled={page === totalPages || isLoading}
-                  >
-                    Siguiente
+                <span className="text-[11px] text-gray-500">
+                  Tip: todo se actualiza al escribir, ideal para llamadas en
+                  vivo.
+                </span>
+              </div>
+              {errorMessage && (
+                <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-red-200 bg-red-50/70 px-4 py-3 text-sm text-red-700">
+                  <p>{errorMessage}</p>
+                  <Button variant="secondary" onClick={refetch}>
+                    Reintentar
                   </Button>
                 </div>
-              </div>
-            )}
-          </>
-        )}
-      </section>
+              )}
+              {!hasResults && !isLoading ? (
+                <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 text-center text-sm text-gray-500">
+                  <p className="font-semibold text-gray-600">
+                    No encontramos modelos con esos filtros.
+                  </p>
+                  <p className="text-xs">
+                    Prueba quitando algún filtro o cambiando el rango de
+                    precios.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div
+                    className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${
+                      isLoading ? "pointer-events-none opacity-60" : ""
+                    }`}
+                  >
+                    {catalogState.products.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        priceBreakdown={productBreakdownMap.get(product.id)!}
+                        fabricCount={product.fabrics.length}
+                        onOpenDetail={handleProductOpen}
+                      />
+                    ))}
+                  </div>
+                  {isLoading && (
+                    <p className="mt-3 text-center text-xs font-semibold text-emerald-700">
+                      Actualizando catálogo...
+                    </p>
+                  )}
+                  {showPagination && hasResults && (
+                    <div className="mt-6 flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                      <span>
+                        Página {page} de {totalPages} · Mostrando{" "}
+                        {pageRangeStart}-{pageRangeEnd} de {catalogState.total}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            setPage((current) => Math.max(1, current - 1))
+                          }
+                          disabled={page === 1 || isLoading}
+                        >
+                          Anterior
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            setPage((current) =>
+                              Math.min(totalPages, current + 1)
+                            )
+                          }
+                          disabled={page === totalPages || isLoading}
+                        >
+                          Siguiente
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </section>
+          </TabPanel>
+          <TabPanel className="focus:outline-none">
+            <CategoryManager
+              categories={categories}
+              products={catalogState.products}
+            />
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
 
       <ProductDetail
         product={detailProduct}

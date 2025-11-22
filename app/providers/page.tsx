@@ -1,5 +1,6 @@
 import { getCatalogPayload } from "@/lib/services/catalog-service";
 import type { Provider } from "@/types";
+import { AddResourceButton } from "@/components/management/add-resource-button";
 
 export default async function ProvidersPage() {
   const { providers, products } = await getCatalogPayload();
@@ -26,6 +27,9 @@ export default async function ProvidersPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <AddResourceButton type="provider" label="+ Nuevo proveedor" />
+      </div>
       <section className="grid gap-3 sm:grid-cols-3">
         <SummaryCard label="Total proveedores" value={providers.length} hint="Activos en tu catálogo" />
         <SummaryCard

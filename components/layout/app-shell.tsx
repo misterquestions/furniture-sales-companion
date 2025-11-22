@@ -6,28 +6,22 @@ import type { ReactNode } from "react";
 
 const NAV_LINKS = [
   {
-    href: "/catalog",
+    href: "/products",
     label: "Catálogo",
     description: "Modelos, precios y existencias",
     icon: CatalogIcon,
   },
   {
-    href: "/proveedores",
+    href: "/providers",
     label: "Proveedores",
     description: "Contactos, lead times y acuerdos",
     icon: ProvidersIcon,
   },
   {
-    href: "/telas",
+    href: "/fabrics",
     label: "Telas",
     description: "Swatches y disponibilidad",
     icon: FabricsIcon,
-  },
-  {
-    href: "/gestion",
-    label: "Gestión",
-    description: "Altas y edición de catálogo",
-    icon: ManageIcon,
   },
 ];
 
@@ -47,8 +41,8 @@ export function AppShell({ children }: AppShellProps) {
         className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.15),_transparent_60%)]"
       />
 
-      <header className="sticky top-0 z-40 border-b border-transparent bg-white/70 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6">
+      <header className="relative z-40 border-b border-transparent bg-transparent px-4 py-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
               Mueblería Alexandra
@@ -100,7 +94,9 @@ export function AppShell({ children }: AppShellProps) {
                   <p className="text-sm font-semibold text-gray-900">
                     {link.label}
                   </p>
-                  <p className="text-[11px] text-gray-500">{link.description}</p>
+                  <p className="text-[11px] text-gray-500">
+                    {link.description}
+                  </p>
                 </div>
               </Link>
             );
